@@ -1,15 +1,5 @@
+"""This file has database user functions"""
 from app.database import get_db
-
-
-# # lists:
-# mylist = [1, 2, 3]
-# mylist = list()
-
-# # tuple:
-# mytuple = (1, 2, 3)
-# mytuple = tuple()
-
-# mytuple1element = (1,)
 
 
 def output_formatter(results):
@@ -40,7 +30,7 @@ def insert(user_dict):
         ) VALUES (?, ?, ?)
     """
     cursor = get_db()
-    last_row_id = cursor.execute(query, value_tuple)
+    last_row_id = cursor.execute(stmt, value_tuple)
     cursor.commit()
     cursor.close()
 
@@ -54,9 +44,27 @@ def scan():
 
 
 def select_by_id(pk):
-    cursor = get_db()
-    cursor.execute(
+    cursor = get_db().execute(
         "SELECT * FROM user WHERE id=?", (pk, ))
     results = cursor.fetchall()
     cursor.close()
     return output_formatter(results)
+
+
+def update(pk, user_data):
+    value_tuple = (
+        user_data["first_name"],
+        user_data["last_name"],
+        user_data["hobbies"],
+        pk
+    )
+    stmt = """
+        UPDATE user
+        SET first_name=?,
+        last_name=?,
+        hobbies=?
+        WHERE id=?
+    """
+    cursor = get_db()
+    cursor.execute(stmt, value_tuple)
+    cursor.commit()
